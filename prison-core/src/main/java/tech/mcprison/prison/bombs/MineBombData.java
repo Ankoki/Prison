@@ -151,6 +151,11 @@ public class MineBombData {
 	 * </p>
 	 */
 	private int itemRemovalDelayTicks = 5; // 0.25 seconds
+
+	/**
+	 * Custom model data to be applied to the item.
+	 */
+	private int customModelData;
 	
 	
 	/**
@@ -240,6 +245,8 @@ public class MineBombData {
 		this.cooldownTicks = 30 * 20;
 		
 		this.itemRemovalDelayTicks = 5;
+
+		this.customModelData = 0;
 		
 		this.glowing = false;
 		this.gravity = true;
@@ -280,7 +287,7 @@ public class MineBombData {
 		
 		cloned.setAutosell( isAutosell() );
 		cloned.setActivated( isActivated() );
-		
+		cloned.setCustomModelData( getCustomModelData() );
 		
 		for ( String l : getLore() ) {
 			cloned.getLore().add( l );
@@ -300,6 +307,13 @@ public class MineBombData {
 		
 		
 		return cloned;
+	}
+
+	public int getCustomModelData() {
+		return customModelData;
+	}
+	public void setCustomModelData(int data) {
+		this.customModelData = data;
 	}
 
 	public String getName() {

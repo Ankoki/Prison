@@ -1,5 +1,6 @@
 package tech.mcprison.prison.spigot.utils;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import com.cryptomorin.xseries.XMaterial;
 import com.cryptomorin.xseries.XSound;
 
+import org.bukkit.inventory.meta.ItemMeta;
 import tech.mcprison.prison.autofeatures.AutoFeaturesFileConfig.AutoFeatures;
 import tech.mcprison.prison.autofeatures.AutoFeaturesWrapper;
 import tech.mcprison.prison.bombs.MineBombData;
@@ -48,7 +50,14 @@ public class PrisonUtilsMineBombs
 	public static final String MINE_BOMBS_LORE_1 = "&4Prison Mine Bomb:";
 	public static final String MINE_BOMBS_LORE_2_PREFIX = "  &7";
 	public static final int MINE_BOMBS_COOLDOWN_TICKS = 5 * 20; // 5 seconds  // 15 seconds
-	
+
+	private static Method SET_CUSTOM_MODEL_DATA;
+
+	static {
+		try {
+			SET_CUSTOM_MODEL_DATA = ItemMeta.class.getDeclaredMethod("setCustomModelData", Integer.class);
+		} catch (NoSuchMethodException ex) { ex.printStackTrace(); }
+	}
 	
 	private boolean enableMineBombs = false;
 	
@@ -698,7 +707,6 @@ public class PrisonUtilsMineBombs
 				
 				bombs.setLore( lore );
 
-				
 				sItemStack = bombs.getBukkitStack();
 			}
 			
@@ -708,6 +716,13 @@ public class PrisonUtilsMineBombs
 				PrisonNBTUtil.setNBTString(sItemStack, MineBombs.MINE_BOMBS_NBT_BOMB_KEY, bombData.getName() );
 //				nbtItem = new NBTItem( sItemStack, true );
 //				nbtItem.setString( MineBombs.MINE_BOMBS_NBT_BOMB_KEY, bombData.getName() );
+				ItemMeta meta = sItemStack.getItemMeta();
+				if (meta != null) {
+					try {
+						SET_CUSTOM_MODEL_DATA.invoke(meta, bombData.getCustomModelData());
+					} catch (ReflectiveOperationException ex) { ex.printStackTrace(); }
+				}
+				sItemStack.setItemMeta(meta);
 
 				if ( Output.get().isDebug() ) {
 					Output.get().logInfo( "getItemStackBombs ntb: %s", PrisonNBTUtil.nbtDebugString(sItemStack) );
@@ -724,7 +739,6 @@ public class PrisonUtilsMineBombs
 			
 			Output.get().logError( message );
 		}
-		
 		return sItemStack;
 	}
 	
